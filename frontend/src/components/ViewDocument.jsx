@@ -2,7 +2,6 @@ import React from 'react';
 import { Check } from 'lucide-react';
 
 // Import images so Vite bundles them correctly in production (Vercel).
-// Adjust the relative path if this file is not one folder below "src" (e.g. src/pages or src/components).
 import headerLogo from '../assets/header-logo.png';
 import footerLogo from '../assets/footer-logo.png';
 
@@ -13,15 +12,26 @@ function Row({ label, value, className = '' }) {
       className={`grid grid-cols-[136px_1fr] max-[340px]:grid-cols-[122px_1fr] items-start text-[10.4px] leading-[16px] text-black ${className}`}
     >
       <span className="font-normal">{label}</span>
-      <span className="font-bold break-words">{value}</span>
+      <span className="font-bold break-words">{value || '-'}</span>
     </div>
   );
 }
 
 export default function ViewDocument({ data }) {
+  // Safe check: Agar data na ho toh app crash hone ke bajaye loading/error dikhaye
+  if (!data) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-white text-black font-sans">
+        <div className="text-center">
+          <p className="text-sm font-semibold text-gray-600">Loading document details...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Reset default page styles (margins, padding, background) so nothing shows above or below the card */}
+      {/* Reset default page styles (margins, padding, background) */}
       <style>{`
         html, body, #root {
           margin: 0 !important;
