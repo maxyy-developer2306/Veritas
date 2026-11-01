@@ -9,11 +9,19 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration (allow requests from Vercel frontend)
 app.use(cors());
 app.use(express.json());
 
-// Main Health Check Route (/api)
+// 1. Root Route (Ab main link open karne par bhi error nahi aayega)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Veritas Backend API is running successfully!',
+    checkDatabaseStatus: 'Visit /api endpoint for database connection details'
+  });
+});
+
+// 2. Health Check Route (/api)
 app.get('/api', (req, res) => {
   const dbState = mongoose.connection.readyState;
   let dbStatus = 'Disconnected';
@@ -45,5 +53,4 @@ mongoose.connect(process.env.MONGO_URI)
   })
   .catch((err) => console.log('DB Connection Error:', err));
 
-// Export for Vercel Serverless Function
 export default app;
