@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
 import RecordModal from '../components/RecordModal';
+import { Button } from '../components/ui/Button';
 import { Plus, Eye, Edit, Trash2, Power, LogOut, FileText, CheckCircle, XCircle } from 'lucide-react';
 
 export default function Dashboard() {
@@ -9,6 +10,7 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const navigate = useNavigate();
+  const [actionLoadingId, setActionLoadingId] = useState(null);
 
   const fetchRecords = async () => {
     try {
@@ -24,21 +26,27 @@ export default function Dashboard() {
   }, []);
 
   const handleToggleStatus = async (id) => {
+    setActionLoadingId(id);
     try {
       await API.patch(`/records/${id}/toggle-status`);
       fetchRecords();
     } catch (err) {
       alert('Status change error!');
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Kya aap is record ko delete karna chahte hain?')) {
+      setActionLoadingId(id);
       try {
         await API.delete(`/records/${id}`);
         fetchRecords();
       } catch (err) {
         alert('Delete fail ho gaya!');
+      } finally {
+        setActionLoadingId(null);
       }
     }
   };
@@ -53,9 +61,9 @@ export default function Dashboard() {
       {/* Top Bar */}
       <div className="max-w-7xl mx-auto flex justify-between items-center pb-6 border-b border-zinc-800">
         <h1 className="text-xl font-bold tracking-widest text-white uppercase">VERITAS CONTROL PANEL</h1>
-        <button onClick={handleLogout} className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 px-4 py-2 rounded text-sm transition">
+        <Button onClick={handleLogout} variant="outline" size="sm">
           <LogOut className="w-4 h-4" /> Logout
-        </button>
+        </Button>
       </div>
 
       {/* Stats Section */}
@@ -86,12 +94,11 @@ export default function Dashboard() {
       {/* Action Bar */}
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold text-zinc-300">Document Records</h2>
-        <button 
+        <Button
           onClick={() => { setSelectedRecord(null); setIsModalOpen(true); }}
-          className="bg-white text-black font-medium px-4 py-2 rounded flex items-center gap-2 hover:bg-zinc-200 transition text-sm"
         >
           <Plus className="w-4 h-4" /> Add New Record
-        </button>
+        </Button>
       </div>
 
       {/* Records Table */}
@@ -123,22 +130,49 @@ export default function Dashboard() {
                   <td className="p-4">
                     <div className="flex items-center justify-center gap-2">
                       {/* Public View Button with Random String URL */}
-                      <button 
-                        onClick={() => window.open(`/view-doc/viewUYFUYFUYFUYFUfuFUFYpiuIHDPTIHJIDTIDTHJDTIOHJDIOTJHDIOTHJIHDITHJDIOTHgIUGIOTHOIDRH/${rec._id}`, '_blank')} 
-                        className="p-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          window.open(
+                            `/view-doc/viewUYFUYFUYFUYFUfuFUFYpiuIHDPTIHJIDTIDTHJDTIOHJDIOTJHDIOTHJIHDITHJDIOTHgIUGIOTHOIDRH/${rec._id}`,
+                            '_blank'
+                          )
+                        }
                         title="View Document"
                       >
                         <Eye className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => { setSelectedRecord(rec); setIsModalOpen(true); }} className="p-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded" title="Edit">
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedRecord(rec);
+                          setIsModalOpen(true);
+                        }}
+                        title="Edit Record"
+                      >
                         <Edit className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => handleToggleStatus(rec._id)} className={`p-2 rounded text-zinc-200 ${rec.isActive ? 'bg-zinc-800 hover:bg-emerald-800' : 'bg-zinc-800 hover:bg-red-800'}`} title="Toggle Active Status">
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleToggleStatus(rec._id)}
+                        loading={actionLoadingId === rec._id}
+                        title={rec.isActive ? 'Deactivate' : 'Activate'}
+                        className={rec.isActive ? 'hover:bg-emerald-800/50 text-emerald-400' : 'hover:bg-red-800/50 text-red-400'}
+                      >
                         <Power className={`w-4 h-4 ${rec.isActive ? 'text-emerald-400' : 'text-red-400'}`} />
-                      </button>
-                      <button onClick={() => handleDelete(rec._id)} className="p-2 bg-zinc-800 hover:bg-red-900/80 text-zinc-200 rounded" title="Delete">
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(rec._id)}
+                        loading={actionLoadingId === rec._id}
+                        title="Delete Record"
+                      >
                         <Trash2 className="w-4 h-4 text-red-400" />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
+import { Button } from '../components/ui/Button';
 import { Lock, User } from 'lucide-react';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loggingIn, setLoggingIn] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoggingIn(true);
     try {
       const res = await API.post('/auth/login', { username, password });
       if (res.data.success) {
@@ -19,6 +22,8 @@ export default function Login() {
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed!');
+    } finally {
+      setLoggingIn(false);
     }
   };
 
@@ -54,9 +59,9 @@ export default function Login() {
               />
             </div>
           </div>
-          <button type="submit" className="w-full bg-white text-black font-semibold py-2 rounded hover:bg-zinc-200 transition mt-4">
+          <Button type="submit" variant="default" className="w-full mt-4" loading={loggingIn}>
             LOGIN
-          </button>
+          </Button>
         </form>
       </div>
     </div>

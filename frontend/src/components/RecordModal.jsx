@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import API from '../services/api';
+import { Button } from './ui/Button';
 import { X } from 'lucide-react';
 
 export default function RecordModal({ record, onClose, onRefresh }) {
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState(record || {
     deliverableId: '',
     publishedOn: '',
@@ -24,6 +26,7 @@ export default function RecordModal({ record, onClose, onRefresh }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
       if (record) {
         await API.put(`/records/${record._id}`, formData);
@@ -34,6 +37,8 @@ export default function RecordModal({ record, onClose, onRefresh }) {
       onClose();
     } catch (err) {
       alert('Save fail ho gaya!');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -42,7 +47,9 @@ export default function RecordModal({ record, onClose, onRefresh }) {
       <div className="bg-zinc-900 border border-zinc-800 w-full max-w-2xl rounded-xl p-6 text-white max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center pb-4 border-b border-zinc-800 mb-4">
           <h3 className="text-lg font-bold">{record ? 'Edit Record' : 'Add New Record'}</h3>
-          <button onClick={onClose} className="p-1 hover:bg-zinc-800 rounded"><X className="w-5 h-5" /></button>
+          <Button onClick={onClose} variant="ghost" size="sm" className="p-1">
+            <X className="w-5 h-5" />
+          </Button>
         </div>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(formData).map((key) => {
@@ -62,8 +69,12 @@ export default function RecordModal({ record, onClose, onRefresh }) {
             );
           })}
           <div className="md:col-span-2 flex justify-end gap-3 mt-4 pt-4 border-t border-zinc-800">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-sm">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-white text-black font-semibold rounded text-sm hover:bg-zinc-200">Save Record</button>
+            <Button type="button" onClick={onClose} variant="ghost" size="sm">
+              Cancel
+            </Button>
+            <Button type="submit" variant="default" size="sm" loading={saving}>
+              Save Record
+            </Button>
           </div>
         </form>
       </div>
