@@ -19,9 +19,9 @@ export default function PublicView() {
         }
       } catch (err) {
         if (err.response?.status === 403) {
-          setErrorMsg(err.response.data.message || 'Yeh document inactive hai!');
+          setErrorMsg(err.response.data.message || 'This document is inactive !');
         } else {
-          setErrorMsg('Record nahi mila ya URL galat hai!');
+          setErrorMsg('No record found');
         }
       } finally {
         setLoading(false);

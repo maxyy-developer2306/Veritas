@@ -38,7 +38,7 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Kya aap is record ko delete karna chahte hain?')) {
+    if (window.confirm('are ypu sure you want to delete this record')) {
       setActionLoadingId(id);
       try {
         await API.delete(`/records/${id}`);
@@ -179,7 +179,7 @@ export default function Dashboard() {
               ))}
               {data.records.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center p-8 text-zinc-600">Koi record nahi mila. Pehla record add karein!</td>
+                  <td colSpan="6" className="text-center p-8 text-zinc-600">waiting... for datasbe conection</td>
                 </tr>
               )}
             </tbody>
