@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
 import { Button } from '../components/ui/Button';
+import { Loader } from '../components/ui/Loader';
 import { Lock, User } from 'lucide-react';
 
 export default function Login() {
@@ -64,6 +65,7 @@ export default function Login() {
           </Button>
         </form>
       </div>
+      {loggingIn && <Loader overlay message="Logging in..." />}
     </div>
   );
 }
